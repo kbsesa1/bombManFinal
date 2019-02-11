@@ -14,7 +14,5 @@ void setup()
 
 void loop()
 {
-
-	  /* add main program code here, this code starts again each time it ends */
-
+	garbage
 }
