@@ -5,7 +5,8 @@
 #define LOW 400
 #define SPACE 200
 
-uint16_t packet[] = {START,HIGH,LOW,HIGH,LOW,HIGH,LOW,HIGH,LOW,HIGH,STOP};
+uint16_t outPacket[] = {START,HIGH,LOW,HIGH,LOW,HIGH,LOW,HIGH,LOW,HIGH,STOP};
+	uint32_t sendBuffer = 0;
 int main(void){
 	init();
 	DDRD |= (1<<PORTD3);
@@ -72,11 +73,18 @@ void sendPulse(uint16_t micros){
 	setIR(false);
 	delayMicroseconds(SPACE);
 }
+void buildPacket(uint16_t *packetBuffer ,uint32_t data){
+	packetBuffer[0] = START;
+	for(int i = 0;i<32;i++){
+		
+	}
+	
+}
 
 void sendTestMessage(){
-	for (int i = 0;i<sizeof(packet)/sizeof(int);i++)
+	for (int i = 0;i<sizeof(outPacket)/sizeof(int);i++)
 	{
-		sendPulse(packet[i]);
+		sendPulse(outPacket[i]);
 	}
 }
 

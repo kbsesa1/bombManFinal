@@ -23,6 +23,7 @@ int main(void);
 void initIRTimer(bool highspeed);
 void setIR(bool state);
 void sendPulse(uint16_t micros);
+void buildPacket(uint16_t *packetBuffer ,uint32_t data);
 void sendTestMessage();
 
 #include "pins_arduino.h" 
