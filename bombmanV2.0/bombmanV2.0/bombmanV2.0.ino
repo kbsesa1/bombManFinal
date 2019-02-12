@@ -5,15 +5,19 @@
 #define LOW 400
 #define SPACE 200
 
-uint16_t outPacket[] = {START,HIGH,LOW,HIGH,LOW,HIGH,LOW,HIGH,LOW,HIGH,STOP};
-	uint32_t sendBuffer = 0;
+uint16_t outPacket[34];
+uint32_t sendBuffer = 0;
 int main(void){
 	init();
-	DDRD |= (1<<PORTD3);
+	Serial.begin(115200);
 	initIRTimer(false);
+	sendBuffer = 255;
 	while(1){
-		delay(100);
-		sendTestMessage();	
+		delay(50);
+		buildPacket(outPacket,sendBuffer);
+		printPacket(outPacket);
+		sendPacket(outPacket);
+		sendBuffer++;
 	}
 	return 0;
 }
@@ -52,35 +56,71 @@ ISR(TIMER2_COMPB_vect){
 	TCNT2 = 0;
 }
 void setIR(bool state){
-	if (state)
-	{
+	if (state){
 		//set timer output to toggle on 38Khz
 		TCCR2A |= (1<<COM2B0);
 		TCCR2A &= ~(1<<COM2B1);
 	}
-	else
-	{
+	else{
 		//disconnect timer output
 		TCCR2A &= ~(1<<COM2B0);
 		TCCR2A &= ~(1<<COM2B1);
-	}
-	
+	}	
 }
-
-void sendPulse(uint16_t micros){
+void sendPulse(uint16_t length){
+	unsigned long lastPulse = micros();
 	setIR(true);
-	delayMicroseconds(micros);
-	setIR(false);
-	delayMicroseconds(SPACE);
-}
-void buildPacket(uint16_t *packetBuffer ,uint32_t data){
-	packetBuffer[0] = START;
-	for(int i = 0;i<32;i++){
+	while(micros() < lastPulse+length){
 		
 	}
-	
+	lastPulse = micros();
+	setIR(false);
+	while(micros() < lastPulse+SPACE){
+		
+	}
+	lastPulse = micros();
 }
-
+void buildPacket(uint16_t *packetBuffer ,uint32_t data){
+	Serial.println("building packet!");
+	uint8_t packetIndex = 0;
+	packetBuffer[packetIndex] = START;
+	packetIndex ++;
+	for(int i = 0;i<32;i++){
+		uint32_t masked = 0;
+		masked = (data>>i) & 1;
+		if (masked)	packetBuffer[packetIndex] = HIGH;
+		else packetBuffer[packetIndex] = LOW;
+		packetIndex++;
+	}
+	packetBuffer[packetIndex] = STOP;
+}
+void printPacket(uint16_t *packetBuffer){
+	Serial.println("packet contents:");
+	Serial.print("(");
+	for (int i = 0;i<34;i++){
+		switch(packetBuffer[i]){
+			case START:
+			Serial.print("ST,");
+			break;
+			case HIGH:
+			Serial.print("H,");
+			break;
+			case LOW:
+			Serial.print("L,");
+			break;
+			case STOP:
+			Serial.print("STP");
+			break;
+		}
+	}
+	Serial.println(")");
+}
+void sendPacket(uint16_t *packetBuffer){
+	for (int i = 0;i<34;i++)
+	{
+		sendPulse(packetBuffer[i]);
+	}
+}
 void sendTestMessage(){
 	for (int i = 0;i<sizeof(outPacket)/sizeof(int);i++)
 	{
@@ -88,6 +128,5 @@ void sendTestMessage(){
 	}
 }
 
-//git test
 
 
