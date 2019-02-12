@@ -1,9 +1,2 @@
-$ cat .gitignore
-    # exclude everything except directory foo/bar
-    /*
-    !/bombmanV2.0
-    /bombmanV2.0/*
-    !/bombmanV2.0/bombmanV2.0
-	/bombmanV2.0/bombmanV2.0/*
-	!/bombmanV2.0/bombmanV2.0/bombmanV2.0.ino
-	!/bombmanV2.0/bombmanV2.0/lib
+bombmanV2.0/*
+!bombmanV2.0/bombmanV2.0/bombmanV2.0.ino
