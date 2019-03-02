@@ -11,7 +11,7 @@
 class IR
 {
 public:
-IR(bool highFrequency = false);
+IR(bool highFrequency);
 void begin();
 void run();
 void send(uint32_t data);

@@ -26,10 +26,10 @@
 
 //Make objects----------
 Scheduler game;
-IR ir = IR(false);
+IR ir = IR(true);
 Adafruit_ILI9341 tft = Adafruit_ILI9341(tft_cs, tft_dc);
 Adafruit_STMPE610 ts = Adafruit_STMPE610(stmpe_cs);
-ArduinoNunchuk nunchuck = ArduinoNunchuk();
+//ArduinoNunchuk nunchuck = ArduinoNunchuk();
 
 //Variables----------
 //test
@@ -61,12 +61,12 @@ void moveDown();
 Task tekenDriehoek(2000, -1, &driehoek);
 Task tekenVierkant(333, -1, &vierkant);
 Task irCommunication(100, -1, &irSend);
-Task printIRData(1000, -1, &irPrint);
+Task printIRData(200, -1, &irPrint);
 
 int main(){
 	//initialisation process Arduino UNO
 	init();
-	
+	Serial.begin(115200);
 	//initialisation process task scheduler
 	game.init();
 	game.addTask(irCommunication);
