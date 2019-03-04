@@ -20,8 +20,13 @@ class Graphics
 	public:
 	Graphics();
 	void init();
-	void drawWall(uint8_t gridWidth,uint8_t gridHeight);
-	void drawMap(uint8_t map[][11]);
+	void buildMap(uint8_t scenario);
+	void drawWall();
+	void drawMap();
+	void updateMap();
+	void changeBlock(uint8_t x,uint8_t y,uint8_t state);
+	
+	
 	protected:
 	private:
 	uint16_t getXfromGrid(uint8_t grid);
@@ -31,6 +36,7 @@ class Graphics
 	uint16_t color565(uint8_t red, uint8_t green, uint8_t blue);
 	void bmpDraw(char *filename, int16_t x, int16_t y);
 	void drawSquare(uint16_t x,uint16_t y);
+	void drawBlock(uint8_t x,uint8_t y,uint8_t state);
 };
 
 

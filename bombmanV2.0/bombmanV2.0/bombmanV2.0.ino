@@ -24,17 +24,7 @@ Adafruit_STMPE610 ts = Adafruit_STMPE610(8);
 
 //Variables----------
 //test
-uint8_t mapData[9][11] = {
-	{0,0,0,0,0,0,0,0,0,0,0},
-		{0,1,2,1,0,1,0,1,0,1,0},
-			{0,0,0,0,0,0,0,0,0,0,0},
-				{0,1,2,1,0,1,0,1,0,1,0},
-					{0,0,0,0,0,2,0,0,0,0,0},
-						{0,1,0,1,0,1,2,1,0,1,0},
-							{0,0,0,0,0,0,0,0,0,0,0},
-								{0,1,0,1,0,1,0,1,0,1,0},
-									{0,0,2,0,0,0,0,0,0,0,0},
-	};
+
 
 
 
@@ -51,14 +41,12 @@ void moveDown();
 
 
 //Tasks----------
-Task irCommunication(100, -1, &irSend);
-Task printIRData(200, -1, &irPrint);
+
 
 int main(){
 	//initialisation process Arduino UNO
 	init();
 	
-	Serial.begin(115200);
 	//initialisation process task scheduler
 	//game.init();
 	//game.addTask(irCommunication);
@@ -87,23 +75,24 @@ int main(){
 	nunchuck.init();
 */
 gfx.init();
-gfx.drawWall(11,9);
-gfx.drawMap(mapData);
+gfx.drawWall();
+gfx.buildMap(0);
+gfx.drawMap();
 
 	while(1){
+		/*
+		gfx.changeBlock(0,0,2);
+		gfx.changeBlock(1,1,2);
+		gfx.changeBlock(2,2,2);
+		gfx.updateMap();
+		delay(100);
+		gfx.changeBlock(0,0,0);
+		gfx.changeBlock(1,1,1);
+		gfx.changeBlock(2,2,0);
+		gfx.updateMap();
+		delay(1000);
+		*/
 		game.execute();
 	}
 }
 
-
-
-void irSend(){
-	ir.run();
-	ir.send(data);
-	data ++;
-}
-void irPrint(){
-	Serial.print("i got: ");
-	uint32_t value = ir.read();
-	Serial.println(value);
-}

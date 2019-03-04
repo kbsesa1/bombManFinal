@@ -14,7 +14,14 @@
 
 #define BUFFPIXEL 20
 
+#define GRIDWIDTH 11
+#define GRIDHEIGHT 9
+
 Adafruit_ILI9341 tft = Adafruit_ILI9341(10, 9);
+
+uint8_t mapData[GRIDHEIGHT][GRIDWIDTH];
+uint8_t updates[20][3];
+uint8_t updateIndex = 0;
 
 Graphics::Graphics(){
 	
@@ -26,43 +33,92 @@ void Graphics::init(){
 	tft.setCursor(0, 0);
 	tft.fillScreen(0x0000);
 }
+
+void Graphics::buildMap(uint8_t scenario){
+switch(scenario){
+	case 0:
+	for (uint8_t x = 0;x<11;x++)
+	{
+		for (uint8_t y = 0;y<9;y++)
+		{
+			mapData[x][y] = 2;
+		}
+	}
+	for (uint8_t x = 0;x<5;x++)
+	{
+		for (uint8_t y = 0;y<4;y++)
+		{
+			mapData[(x*2)+1][(y*2)+1] = 1;
+		}
+	}
+	mapData[0][0] = 0;
+	mapData[0][1] = 0;
+	mapData[1][0] = 0;
+	mapData[9][11] = 0;
+	mapData[9][10] = 0;
+	mapData[8][11] = 0;
+	break;
+}	
+}
+
 void Graphics::drawSquare(uint16_t x,uint16_t y){
 	tft.fillRect(x,y, 50,50,gold);
 }
 
-void Graphics::drawWall(uint8_t gridWidth,uint8_t gridHeight){
+void Graphics::drawWall(){
 	//draw top wall
-	for(int i = 0;i<gridWidth+2;i++) {
+	for(int i = 0;i<GRIDWIDTH+2;i++) {
 		bmpDraw("Wall1.bmp",i*20,0);
 	}
 	//draw sides
-	for(int i = 0;i<gridHeight;i++) {
+	for(int i = 0;i<GRIDHEIGHT;i++) {
 		bmpDraw("Wall1.bmp",0,(i*20)+20);
-		bmpDraw("Wall1.bmp",(gridWidth+1)*20,(i*20)+20);
+		bmpDraw("Wall1.bmp",(GRIDWIDTH+1)*20,(i*20)+20);
 	}
 	//draw bottom wall
-	for(int i = 0;i<gridWidth+2;i++) {
-		bmpDraw("Wall1.bmp",i*20,(gridHeight+1)*20);
+	for(int i = 0;i<GRIDWIDTH+2;i++) {
+		bmpDraw("Wall1.bmp",i*20,(GRIDHEIGHT+1)*20);
 	}
 }
 
-void Graphics::drawMap(uint8_t map[][11]){
-	for (uint8_t x = 0; x<11;x++)
+void Graphics::drawMap(){
+	for (uint8_t x = 0; x<GRIDWIDTH;x++)
 	{
-		for (uint8_t y = 0;y<9;y++)
+		for (uint8_t y = 0;y<GRIDHEIGHT;y++)
 		{
-			switch (map[y][x]){
-				case 1:
-				bmpDraw("Wall1.bmp",getXfromGrid(x),getYfromGrid(y));
-				break;
-				case 2:
-				bmpDraw("Crate1.bmp",getXfromGrid(x),getYfromGrid(y));
-				break;
-			}
+			drawBlock(x,y,mapData[x][y]);
 		}
 	}
 }
 
+void Graphics::updateMap(){
+	for (uint8_t i = 0;i<updateIndex;i++)
+	{
+		drawBlock(updates[i][0],updates[i][1],updates[i][2]);
+	}
+	updateIndex = 0;
+}
+
+void Graphics::changeBlock(uint8_t x,uint8_t y,uint8_t state){
+	updates[updateIndex][0] = x;
+	updates[updateIndex][1] = y;
+	updates[updateIndex][2] = state;
+	updateIndex++;
+}
+
+void Graphics::drawBlock(uint8_t x,uint8_t y,uint8_t state){
+	switch (state){
+		case 1:
+		bmpDraw("Wall1.bmp",getXfromGrid(x),getYfromGrid(y));
+		break;
+		case 2:
+		bmpDraw("Crate1.bmp",getXfromGrid(x),getYfromGrid(y));
+		break;
+		default:
+		tft.fillRect(getXfromGrid(x),getYfromGrid(y),20,20,0x0000);
+		break;
+	}
+}
 uint16_t Graphics::getXfromGrid(uint8_t grid){
 	return grid*20+20;
 }
