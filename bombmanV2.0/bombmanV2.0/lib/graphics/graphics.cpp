@@ -20,6 +20,8 @@ uint8_t mapData[GRIDHEIGHT][GRIDWIDTH];
 uint8_t updates[20][3];
 uint8_t updateIndex = 0;
 
+char wallPath[] = "map/Wall1.bmp";
+
 Graphics::Graphics(){
 	
 }
@@ -74,16 +76,16 @@ void Graphics::drawSquare(uint16_t x,uint16_t y){
 void Graphics::drawWall(){
 	//draw top wall
 	for(int i = 0;i<GRIDWIDTH+2;i++) {
-		bmpDraw("Wall1.bmp",i*20,0);
+		bmpDraw(wallPath,i*20,0);
 	}
 	//draw sides
 	for(int i = 0;i<GRIDHEIGHT;i++) {
-		bmpDraw("Wall1.bmp",0,(i*20)+20);
-		bmpDraw("Wall1.bmp",(GRIDWIDTH+1)*20,(i*20)+20);
+		bmpDraw(wallPath,0,(i*20)+20);
+		bmpDraw(wallPath,(GRIDWIDTH+1)*20,(i*20)+20);
 	}
 	//draw bottom wall
 	for(int i = 0;i<GRIDWIDTH+2;i++) {
-		bmpDraw("Wall1.bmp",i*20,(GRIDHEIGHT+1)*20);
+		bmpDraw(wallPath,i*20,(GRIDHEIGHT+1)*20);
 	}
 }
 
@@ -120,10 +122,10 @@ void Graphics::changeBlock(uint8_t x,uint8_t y,uint8_t state){
 void Graphics::drawBlock(uint8_t x,uint8_t y,uint8_t state){
 	switch (state){
 		case 1:
-		bmpDraw("Wall1.bmp",getXfromGrid(x),getYfromGrid(y));
+		bmpDraw(wallPath,getXfromGrid(x),getYfromGrid(y));
 		break;
 		case 2:
-		bmpDraw("Crate1.bmp",getXfromGrid(x),getYfromGrid(y));
+		bmpDraw("map/Crate1.bmp",getXfromGrid(x),getYfromGrid(y));
 		break;
 		default:
 		tft.fillRect(getXfromGrid(x),getYfromGrid(y),20,20,0x0000);
@@ -271,11 +273,34 @@ uint32_t Graphics::read32(File &f) {
 }
 
 void Graphics::drawPlayer(Player p){
+	char file[24];
 	if (p.isRedrawn())
 	{
 		drawBlock(p.getLastX(),p.getLastY(),OPENSPACE);
 		drawBlock(p.getCurrentX(),p.getCurrentY(),OPENSPACE);
-		bmpDraw("bman1.bmp",getXfromGrid(p.getCurrentX()),getYfromGrid(p.getCurrentY()));
+		if (p.getColor() == PLAYERONE)
+		{
+			strcpy(file,"p1/");
+			switch(p.getDirection()){
+				case DOWN:
+				strcat(file,"down/");
+				break;
+				case UP:
+				strcat(file,"up/");
+				break;
+				case LEFT:
+				strcat(file,"left/");
+				break;
+				case RIGHT:
+				strcat(file,"right/");
+				break;
+			}
+			char number[3];
+			sprintf(number,"%d",p.getStep());
+			strcat(file,number);
+			strcat(file,".bmp");
+		}
+		bmpDraw(file,getXfromGrid(p.getCurrentX()),getYfromGrid(p.getCurrentY()));
 		p.drawn();
 	}
 	

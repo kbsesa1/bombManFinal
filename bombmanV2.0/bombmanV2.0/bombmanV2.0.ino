@@ -28,7 +28,8 @@ Player p1 = Player(PLAYERONE);
 //Variables----------
 //test
 uint8_t gameTestIndex;
-
+uint8_t stepsIndex;
+uint8_t directionIndex;
 
 
 //Functions----------
@@ -44,8 +45,8 @@ void moveDown();
 
 
 //Tasks----------
-Task mapDraw (100, -1, &onMapDraw);
-Task gameTest (1000, -1, &onGameTest);
+Task mapDraw (50, -1, &onMapDraw);
+Task gameTest (200, -1, &onGameTest);
 
 void onMapDraw(){
 	gfx.updateMap();
@@ -53,36 +54,16 @@ void onMapDraw(){
 }
 
 void onGameTest(){
-	switch (gameTestIndex){
-		case 0:
-		gfx.changeBlock(2,0,0);
-		gfx.changeBlock(8,8,0);
-		break;
-		case 1:
-		gfx.changeBlock(3,0,0);
-		gfx.changeBlock(7,8,0);
-		break;
-		case 2:
-		gfx.changeBlock(4,0,0);
-		gfx.changeBlock(6,8,0);
-		break;
-		case 3:
-		gfx.changeBlock(4,0,2);
-		gfx.changeBlock(6,8,2);
-		break;
-		case 4:
-		gfx.changeBlock(3,0,2);
-		gfx.changeBlock(7,8,2);
-		break;
-		case 5:
-		gfx.changeBlock(2,0,2);
-		gfx.changeBlock(8,8,2);
-		break;
-	}
-	gameTestIndex++;
-	if (gameTestIndex >= 6)
+	p1.walk(directionIndex);
+	stepsIndex++;
+	if (stepsIndex >= 12)
 	{
-		gameTestIndex = 0;
+		stepsIndex = 0;
+		directionIndex ++;
+		if (directionIndex >= 4)
+		{
+			directionIndex = 0;
+		}
 	}
 }
 
@@ -97,7 +78,7 @@ int main(){
 	game.addTask(gameTest);
 	
 	mapDraw.enable();
-	//gameTest.enable();
+	gameTest.enable();
 	//game.addTask(printIRData);
 	//irCommunication.enable();
 	//printIRData.enable();
