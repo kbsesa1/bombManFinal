@@ -7,12 +7,9 @@
 
 
 //Colors
-#define black 0x0000
-#define brown 0xB3CA
-#define gold  0xFE41
-#define grey  0x7BEF
 
-#define BUFFPIXEL 20
+
+#define BUFFPIXEL 5
 
 #define GRIDWIDTH 11
 #define GRIDHEIGHT 9
@@ -34,6 +31,15 @@ void Graphics::init(){
 	tft.fillScreen(0x0000);
 }
 
+uint8_t Graphics::getMapData(uint8_t x,uint8_t y){
+	return mapData[y][x];
+}
+
+void Graphics::setMapData(uint8_t x,uint8_t y,uint8_t value){
+	mapData[y][x] = value;
+}
+
+
 void Graphics::buildMap(uint8_t scenario){
 switch(scenario){
 	case 0:
@@ -41,22 +47,22 @@ switch(scenario){
 	{
 		for (uint8_t y = 0;y<9;y++)
 		{
-			mapData[x][y] = 2;
+			setMapData(x,y,CRATE);
 		}
 	}
 	for (uint8_t x = 0;x<5;x++)
 	{
 		for (uint8_t y = 0;y<4;y++)
 		{
-			mapData[(x*2)+1][(y*2)+1] = 1;
+			setMapData((x*2)+1,(y*2)+1,WALL);
 		}
 	}
-	mapData[0][0] = 0;
-	mapData[0][1] = 0;
-	mapData[1][0] = 0;
-	mapData[9][11] = 0;
-	mapData[9][10] = 0;
-	mapData[8][11] = 0;
+	setMapData(0,0,OPENSPACE);
+	setMapData(0,1,OPENSPACE);
+	setMapData(1,0,OPENSPACE);
+	setMapData(10,8,OPENSPACE);
+	setMapData(9,8,OPENSPACE);
+	setMapData(10,7,OPENSPACE);
 	break;
 }	
 }
@@ -86,7 +92,7 @@ void Graphics::drawMap(){
 	{
 		for (uint8_t y = 0;y<GRIDHEIGHT;y++)
 		{
-			drawBlock(x,y,mapData[x][y]);
+			drawBlock(x,y,getMapData(x,y));
 		}
 	}
 }
@@ -94,16 +100,21 @@ void Graphics::drawMap(){
 void Graphics::updateMap(){
 	for (uint8_t i = 0;i<updateIndex;i++)
 	{
+		mapData[updates[i][0]][updates[i][1]] = updates[i][2];
 		drawBlock(updates[i][0],updates[i][1],updates[i][2]);
 	}
 	updateIndex = 0;
 }
 
 void Graphics::changeBlock(uint8_t x,uint8_t y,uint8_t state){
-	updates[updateIndex][0] = x;
-	updates[updateIndex][1] = y;
-	updates[updateIndex][2] = state;
-	updateIndex++;
+	if (mapData[x][y] != state)
+	{
+		updates[updateIndex][0] = x;
+		updates[updateIndex][1] = y;
+		updates[updateIndex][2] = state;
+		updateIndex++;
+	}
+	
 }
 
 void Graphics::drawBlock(uint8_t x,uint8_t y,uint8_t state){
@@ -145,6 +156,7 @@ void Graphics::bmpDraw(char *filename, int16_t x, int16_t y) {
 
 	// Open requested file on SD card
 	if ((bmpFile = SD.open(filename)) == NULL) {
+		Serial.println("file not found");
 		return;
 	}
 
@@ -235,7 +247,10 @@ void Graphics::bmpDraw(char *filename, int16_t x, int16_t y) {
 			} // end goodBmp
 		}
 	}
-
+if (!goodBmp)
+{
+	Serial.println("bitmap error!");
+}
 	bmpFile.close();
 }
 
@@ -253,4 +268,15 @@ uint32_t Graphics::read32(File &f) {
 	((uint8_t *)&result)[2] = f.read();
 	((uint8_t *)&result)[3] = f.read(); // MSB
 	return result;
+}
+
+void Graphics::drawPlayer(Player p){
+	if (p.isRedrawn())
+	{
+		drawBlock(p.getLastX(),p.getLastY(),OPENSPACE);
+		drawBlock(p.getCurrentX(),p.getCurrentY(),OPENSPACE);
+		bmpDraw("bman1.bmp",getXfromGrid(p.getCurrentX()),getYfromGrid(p.getCurrentY()));
+		p.drawn();
+	}
+	
 }
