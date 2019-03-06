@@ -11,6 +11,20 @@
 //Defines----------
 #define GRIDWIDTH
 #define GRIDHEIGHT
+#define STMPE_CS 8
+
+//data voor het scherm voor touchscreen functionaliteit
+#define TS_MINX 30
+#define TS_MINY 30
+#define TS_MAXX 4000
+#define TS_MAXY 4000
+#define MINPRESSURE 50
+#define MAXPRESSURE 1000
+
+enum scherm{Home, Start, Join, Winner, Death};
+typedef enum scherm scherm_t;
+scherm_t scherm;
+
 
 //Make objects----------
 Scheduler game;
@@ -21,6 +35,9 @@ Player p1 = Player(PLAYERONE);
 ArduinoNunchuk nunchuck = ArduinoNunchuk();
 
 //Variables----------
+uint8_t huidig_scherm_menu = 0;
+uint8_t keuze_touch_menu = 1;
+
 //test
 uint8_t gameTestIndex;
 uint8_t stepsIndex;
@@ -38,11 +55,11 @@ void moveDown();
 
 void onMapDraw();
 void onGameTest();
+void onMenu(uint8_t menuCase);
 //Tasks----------
 Task mapDraw (50, -1, &onMapDraw);
 Task gameTest (200, -1, &onGameTest);
-Task lobby (1, 1, &onLobby);
-Task homescreen (1, 1, &onHomescreen);
+Task menu (1, -1, &onMenu);
 
 int main(){
 	//initialisation process Arduino UNO
@@ -53,10 +70,8 @@ int main(){
 	game.init();
 	game.addTask(mapDraw);
 	game.addTask(gameTest);
-	game.addTask(lobby);
-	game.addTask(homescreen);
-	
-	homescreen.enable();
+	game.addTask(menu);
+	menu.enable();
 
 	//mapDraw.enable();
 	//gameTest.enable();
@@ -99,21 +114,38 @@ void onMapDraw(){
 void onGameTest(){
 	p1.walk(directionIndex,gfx);
 	stepsIndex++;
-	if (stepsIndex >= 12)
-	{
+	if (stepsIndex >= 12){
 		stepsIndex = 0;
 		directionIndex ++;
-		if (directionIndex >= 4)
-		{
+		if (directionIndex >= 4){
 			directionIndex = 0;
 		}
 	}
 }
 
-void onLobby(){
-	gfx.drawLobby();
-}
+void onMenu(){
+	if (ts.bufferEmpty()) {
+		return;
+	}
+	
+	TS_Point p = ts.getPoint();
+	
 
-void onHomescreen(){
-	gfx.drawHomescreen();
+	if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
+
+		// Scale from ~0->4000 to tft.width using the calibration #'s
+		p.x = map(p.x, TS_MINX, TS_MAXX, 0, 240);
+		p.y = map(p.y, TS_MINY, TS_MAXY, 0, 320);
+
+		//Display received X an Y value from touch
+		Serial.print("p.x="); Serial.print(p.x);
+		Serial.print(", p.y="); Serial.print(p.y);
+		Serial.print(", p.z="); Serial.println(p.z);
+	}
+	
+	if (huidig_scherm_menu != keuze_touch_menu){
+		gfx.drawMenu(keuze_touch_menu);
+		huidig_scherm_menu = keuze_touch_menu;
+	}
+	
 }

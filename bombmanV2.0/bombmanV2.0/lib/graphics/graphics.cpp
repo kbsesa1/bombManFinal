@@ -5,7 +5,7 @@
 #define gold  0xFE41
 #define grey  0x7BEF
 
-#define BUFFPIXEL 5
+#define BUFFPIXEL 5	
 
 #define GRIDWIDTH 11
 #define GRIDHEIGHT 9
@@ -303,14 +303,44 @@ void Graphics::drawPlayer(Player &p){
 	}
 	
 }
-// Draws two sqaures to make a button
+
+//Draw one of the menu's, switch-case
+void Graphics::drawMenu(uint8_t menu){
+	switch(menu){
+		case 1 : drawHomescreen();
+			break;
+		case 2 : drawLobby();
+			break;
+	}
+}
+
+// Draws two sqaures to make a button  
 void Graphics::drawButton(uint8_t xc, uint8_t yc, uint8_t xl, uint8_t yl){
 	#define offset 5    //thickness of the brown border
 	tft.fillRect(xc,yc,xl,yl,brown);
 	tft.fillRect(xc+offset,yc+offset, xl-(2*offset), yl-(2*offset), gold);
 }
 
-// Draws the lobbyscreen
+// Draws the homescreen - switch 1
+void Graphics::drawHomescreen(){
+	tft.fillScreen(grey);
+	tft.setTextSize(7);
+	tft.setTextColor(gold);
+	tft.setCursor(33, 15);
+	tft.print("BOMBER");
+	tft.setCursor(95, 80);
+	tft.print("MAN");
+	drawButton(30,150, 120, 50);
+	drawButton(170, 150, 120, 50);
+	tft.setTextSize(3);
+	tft.setTextColor(black);
+	tft.setCursor(50, 165);
+	tft.print("Start");
+	tft.setCursor(195, 165);
+	tft.print("Join");
+}
+
+// Draws the lobbyscreen - switch 2
 void Graphics::drawLobby(){
 	tft.fillScreen(grey);
 	tft.setTextSize(5);
@@ -331,19 +361,3 @@ void Graphics::drawLobby(){
 	tft.fillRect(130,70,160,145,grey);
 }
 
-// Draws the homescreen
-void Graphics::drawHomescreen(){
-	tft.fillScreen(grey);
-	tft.setTextSize(5);
-	tft.setTextColor(gold);
-	tft.setCursor(29, 15);
-	tft.print("BOMBERMAN");
-	drawButton(30,70, 120, 50);
-	drawButton(170, 70, 120, 50);
-	tft.setTextSize(4);
-	tft.setTextColor(black);
-	tft.setCursor(29, 15);
-	tft.print("Start")
-	tft.setCursor(29, 15);
-	tft.print("Join");
-}

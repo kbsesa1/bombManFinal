@@ -37,6 +37,7 @@ class Graphics
 	void changeBlock(uint8_t x,uint8_t y,uint8_t state);
 	uint8_t getMapData(uint8_t x,uint8_t y);
 	void drawPlayer(Player &p);
+	void drawMenu(uint8_t menu);
 	void drawHomescreen();
 	void drawLobby();
 	void drawButton(uint8_t xc, uint8_t yc, uint8_t xl, uint8_t yl);
