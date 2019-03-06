@@ -12,7 +12,6 @@
 #include <Adafruit_ILI9341.h>
 #include <SPI.h>
 #include <SD.h>
-
 #include "../entities/player.h"
 
 #define OPENSPACE 0
@@ -37,9 +36,9 @@ class Graphics
 	void updateMap();
 	void changeBlock(uint8_t x,uint8_t y,uint8_t state);
 	uint8_t getMapData(uint8_t x,uint8_t y);
-	void drawPlayer(Player p);
+	void drawPlayer(Player &p);	
 	protected:
-	private:
+	private:	
 	uint16_t getXfromGrid(uint8_t grid);
 	uint16_t getYfromGrid(uint8_t grid);
 	uint16_t read16(File &f);

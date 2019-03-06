@@ -1,5 +1,3 @@
-#include "bomb.h"
-
 
 //Libraries--------
 
@@ -12,7 +10,6 @@
 #include "lib/irComm/irComm.h"
 #include "lib/graphics/graphics.h"
 #include "lib/controls/controls.h"
-#include "lib/entities/player.h"
 
 //Defines----------
 #define GRIDWIDTH
@@ -55,7 +52,7 @@ void onMapDraw(){
 }
 
 void onGameTest(){
-	p1.walk(directionIndex);
+	p1.walk(directionIndex,gfx);
 	stepsIndex++;
 	if (stepsIndex >= 12)
 	{

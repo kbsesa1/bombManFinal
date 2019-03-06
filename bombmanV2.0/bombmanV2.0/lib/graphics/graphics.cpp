@@ -22,6 +22,8 @@ uint8_t updateIndex = 0;
 
 char wallPath[] = "map/Wall1.bmp";
 
+class Player;
+
 Graphics::Graphics(){
 	
 }
@@ -272,7 +274,7 @@ uint32_t Graphics::read32(File &f) {
 	return result;
 }
 
-void Graphics::drawPlayer(Player p){
+void Graphics::drawPlayer(Player &p){
 	char file[24];
 	if (p.isRedrawn())
 	{
@@ -300,7 +302,7 @@ void Graphics::drawPlayer(Player p){
 			strcat(file,number);
 			strcat(file,".bmp");
 		}
-		bmpDraw(file,getXfromGrid(p.getCurrentX()),getYfromGrid(p.getCurrentY()));
+		bmpDraw(file,p.getPositionX(),p.getPositionY());
 		p.drawn();
 	}
 	
