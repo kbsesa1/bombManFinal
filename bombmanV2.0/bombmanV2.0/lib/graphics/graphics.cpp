@@ -1,13 +1,9 @@
-// 
-// 
-// 
-
 #include "graphics.h"
-
-
-
 //Colors
-
+#define black 0x0000
+#define brown 0xB3CA
+#define gold  0xFE41
+#define grey  0x7BEF
 
 #define BUFFPIXEL 5
 
@@ -306,4 +302,48 @@ void Graphics::drawPlayer(Player &p){
 		p.drawn();
 	}
 	
+}
+// Draws two sqaures to make a button
+void Graphics::drawButton(uint8_t xc, uint8_t yc, uint8_t xl, uint8_t yl){
+	#define offset 5    //thickness of the brown border
+	tft.fillRect(xc,yc,xl,yl,brown);
+	tft.fillRect(xc+offset,yc+offset, xl-(2*offset), yl-(2*offset), gold);
+}
+
+// Draws the lobbyscreen
+void Graphics::drawLobby(){
+	tft.fillScreen(grey);
+	tft.setTextSize(5);
+	tft.setTextColor(gold);
+	tft.setCursor(29,15);
+	tft.print("BOMBERMAN");
+	drawButton(20, 60, 90, 110);
+	tft.setTextColor(black);
+	tft.setTextSize(5);
+	tft.setCursor(38,95);
+	tft.print("GO");
+	drawButton(20, 180, 90, 45);
+	tft.setTextColor(black);
+	tft.setTextSize(3);
+	tft.setCursor(33,192);
+	tft.print("back");
+	drawButton(120, 60, 180,165);
+	tft.fillRect(130,70,160,145,grey);
+}
+
+// Draws the homescreen
+void Graphics::drawHomescreen(){
+	tft.fillScreen(grey);
+	tft.setTextSize(5);
+	tft.setTextColor(gold);
+	tft.setCursor(29, 15);
+	tft.print("BOMBERMAN");
+	drawButton(30,70, 120, 50);
+	drawButton(170, 70, 120, 50);
+	tft.setTextSize(4);
+	tft.setTextColor(black);
+	tft.setCursor(29, 15);
+	tft.print("Start")
+	tft.setCursor(29, 15);
+	tft.print("Join");
 }
