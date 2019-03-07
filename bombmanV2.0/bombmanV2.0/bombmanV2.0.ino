@@ -1,7 +1,7 @@
 //Bomberman opdracht voor KBS ESA1 - door Bart, Jarom, Joost en Rik
 //Libraries--------
-#include <Adafruit_STMPE610.h>
-#include <ArduinoNunchuk.h>
+//#include <Adafruit_STMPE610.h>
+//#include <ArduinoNunchuk.h>
 #include <TaskScheduler.h>
 //project specific
 #include "lib/irComm/irComm.h"
@@ -30,9 +30,10 @@ scherm_t scherm;
 Scheduler game;
 IR ir = IR(true);
 Graphics gfx;
-Adafruit_STMPE610 ts = Adafruit_STMPE610(8);
+//Adafruit_STMPE610 ts = Adafruit_STMPE610(8);
 Player p1 = Player(PLAYERONE);
-ArduinoNunchuk nunchuck = ArduinoNunchuk();
+Map map1 = Map();
+//ArduinoNunchuk nunchuck = ArduinoNunchuk();
 
 //Variables----------
 uint8_t huidig_scherm_menu = 0;
@@ -59,25 +60,14 @@ void onMenu(uint8_t menuCase);
 //Tasks----------
 Task mapDraw (50, -1, &onMapDraw);
 Task gameTest (200, -1, &onGameTest);
-Task menu (1, -1, &onMenu);
+//Task menu (1, -1, &onMenu);
 
 int main(){
 	//initialisation process Arduino UNO
 	init();
 	Serial.begin(115200);
 	
-	//initialisation process task scheduler
-	game.init();
-	game.addTask(mapDraw);
-	game.addTask(gameTest);
-	game.addTask(menu);
-	menu.enable();
-
-	//mapDraw.enable();
-	//gameTest.enable();
-	//game.addTask(printIRData);
-	//irCommunication.enable();
-	//printIRData.enable();
+	
 	
 	//initialisation process infrared communication
 	//ir.begin();
@@ -85,13 +75,10 @@ int main(){
 	
 	//initialisation process tft screen
 	gfx.init();
-	gfx.drawWall();
-	gfx.buildMap(0);
-	gfx.drawMap();
 	
 	
 	//initialisation process touchscreen support
-	ts.begin();
+	//ts.begin();
 
 /*
 	//initialisation process Wii nunchuck
@@ -100,6 +87,20 @@ int main(){
 	nunchuck.init();
 */
 	
+gfx.drawChar(0,0,132,0xffff,0x0000,1);
+
+//initialisation process task scheduler
+game.init();
+game.addTask(mapDraw);
+game.addTask(gameTest);
+//game.addTask(menu);
+//menu.enable();
+
+//mapDraw.enable();
+gameTest.enable();
+//game.addTask(printIRData);
+//irCommunication.enable();
+//printIRData.enable();
 
 	while(1){
 		game.execute();	
@@ -112,17 +113,9 @@ void onMapDraw(){
 }
 
 void onGameTest(){
-	p1.walk(directionIndex,gfx);
-	stepsIndex++;
-	if (stepsIndex >= 12){
-		stepsIndex = 0;
-		directionIndex ++;
-		if (directionIndex >= 4){
-			directionIndex = 0;
-		}
-	}
+	p1.walk(DOWN);
 }
-
+/*
 void onMenu(){
 	if (ts.bufferEmpty()) {
 		return;
@@ -149,3 +142,4 @@ void onMenu(){
 	}
 	
 }
+*/

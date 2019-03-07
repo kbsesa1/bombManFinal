@@ -62,22 +62,22 @@ uint8_t Player::isRedrawn(){
 void Player::drawn(){
 	needsRedraw = 0;
 }
-void Player::walk(uint8_t Direction,Graphics &gfx){
+void Player::walk(uint8_t Direction){
 	direction = Direction;
-	switch(direction){
-		case UP:
-		positionY -= 5;
-		break;
-		case DOWN:
-		positionY += 5;
-		break;
-		case LEFT:
-		positionX -= 5;
-		break;
-		case RIGHT:
-		positionX += 5;
-		break;
-	}
+// 	switch(direction){
+// 		case UP:
+// 		positionY -= 5;
+// 		break;
+// 		case DOWN:
+// 		positionY += 5;
+// 		break;
+// 		case LEFT:
+// 		positionX -= 5;
+// 		break;
+// 		case RIGHT:
+// 		positionX += 5;
+// 		break;
+// 	}
 	step++;
 	if (step >= 3)
 	{

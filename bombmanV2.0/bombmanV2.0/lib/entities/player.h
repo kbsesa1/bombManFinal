@@ -30,7 +30,7 @@ class Player{
 	uint16_t getPositionY();
 	uint8_t getDirection();
 	uint8_t getStep();
-	void walk(uint8_t Direction,Graphics &gfx);
+	void walk(uint8_t Direction);
 	uint8_t isRedrawn();
 	void drawn();
 	private:

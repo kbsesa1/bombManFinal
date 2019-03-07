@@ -7,113 +7,65 @@
 
 #define BUFFPIXEL 5	
 
-#define GRIDWIDTH 11
-#define GRIDHEIGHT 9
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(10, 9);
 
-uint8_t mapData[GRIDHEIGHT][GRIDWIDTH];
-uint8_t updates[20][3];
-uint8_t updateIndex = 0;
 
 char wallPath[] = "map/Wall1.bmp";
 
 class Player;
+class Map;
+
 
 Graphics::Graphics(){
 	
 }
 void Graphics::init(){
-	SD.begin(4);
+	Serial.println("graphics init");
+	if (SD.begin(4))
+	{
+		Serial.println("SD ok!");
+	}else{
+		Serial.println("SD error!");
+	}
+	
 	tft.begin();
 	tft.setRotation(1);
 	tft.setCursor(0, 0);
 	tft.fillScreen(0x0000);
 }
 
-uint8_t Graphics::getMapData(uint8_t x,uint8_t y){
-	return mapData[y][x];
-}
-
-void Graphics::setMapData(uint8_t x,uint8_t y,uint8_t value){
-	mapData[y][x] = value;
-}
-
-
-void Graphics::buildMap(uint8_t scenario){
-switch(scenario){
-	case 0:
-	for (uint8_t x = 0;x<11;x++)
-	{
-		for (uint8_t y = 0;y<9;y++)
-		{
-			setMapData(x,y,CRATE);
-		}
-	}
-	for (uint8_t x = 0;x<5;x++)
-	{
-		for (uint8_t y = 0;y<4;y++)
-		{
-			setMapData((x*2)+1,(y*2)+1,WALL);
-		}
-	}
-	setMapData(0,0,OPENSPACE);
-	setMapData(0,1,OPENSPACE);
-	setMapData(1,0,OPENSPACE);
-	setMapData(10,8,OPENSPACE);
-	setMapData(9,8,OPENSPACE);
-	setMapData(10,7,OPENSPACE);
-	break;
-}	
-}
-
 void Graphics::drawSquare(uint16_t x,uint16_t y){
 	tft.fillRect(x,y, 50,50,gold);
 }
 
-void Graphics::drawWall(){
+void Graphics::drawWall(uint8_t height,uint8_t width){
 	//draw top wall
-	for(int i = 0;i<GRIDWIDTH+2;i++) {
+	for(int i = 0;i<width+2;i++) {
 		bmpDraw(wallPath,i*20,0);
 	}
 	//draw sides
-	for(int i = 0;i<GRIDHEIGHT;i++) {
+	for(int i = 0;i<height;i++) {
 		bmpDraw(wallPath,0,(i*20)+20);
-		bmpDraw(wallPath,(GRIDWIDTH+1)*20,(i*20)+20);
+		bmpDraw(wallPath,(width+1)*20,(i*20)+20);
 	}
 	//draw bottom wall
-	for(int i = 0;i<GRIDWIDTH+2;i++) {
-		bmpDraw(wallPath,i*20,(GRIDHEIGHT+1)*20);
+	for(int i = 0;i<width+2;i++) {
+		bmpDraw(wallPath,i*20,(height+1)*20);
 	}
 }
 
-void Graphics::drawMap(){
+void Graphics::drawMap(Map &m){
 	for (uint8_t x = 0; x<GRIDWIDTH;x++)
 	{
 		for (uint8_t y = 0;y<GRIDHEIGHT;y++)
 		{
-			drawBlock(x,y,getMapData(x,y));
+			drawBlock(x,y,m.getMapData(x,y));
 		}
 	}
 }
 
 void Graphics::updateMap(){
-	for (uint8_t i = 0;i<updateIndex;i++)
-	{
-		mapData[updates[i][0]][updates[i][1]] = updates[i][2];
-		drawBlock(updates[i][0],updates[i][1],updates[i][2]);
-	}
-	updateIndex = 0;
-}
-
-void Graphics::changeBlock(uint8_t x,uint8_t y,uint8_t state){
-	if (mapData[x][y] != state)
-	{
-		updates[updateIndex][0] = x;
-		updates[updateIndex][1] = y;
-		updates[updateIndex][2] = state;
-		updateIndex++;
-	}
 	
 }
 
@@ -270,6 +222,53 @@ uint32_t Graphics::read32(File &f) {
 	return result;
 }
 
+void Graphics::drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t size) {
+
+File     fontFile;
+uint8_t bitmap[5];
+
+if ((fontFile = SD.open("font.hex")) == NULL) {
+	Serial.println("file not found");
+	return;
+}
+
+for(int i = 0;i<5;i++){
+	bitmap[i] = fontFile.read();
+}
+fontFile.close();
+
+		if((x >= 320)            || // Clip right
+		(y >= 240)           || // Clip bottom
+		((x + 6 * size - 1) < 0) || // Clip left
+		((y + 8 * size - 1) < 0))   // Clip top
+		return;
+
+		
+		tft.startWrite();
+		for(int8_t i=0; i<5; i++ ) { // Char bitmap = 5 columns
+			uint8_t line = bitmap[c * 5 + i];
+			for(int8_t j=0; j<8; j++, line >>= 1) {
+				if(line & 1) {
+					if(size == 1)
+					tft.writePixel(x+i, y+j, color);
+					else
+					tft.writeFillRect(x+i*size, y+j*size, size, size, color);
+					} else if(bg != color) {
+					if(size == 1)
+					tft.writePixel(x+i, y+j, bg);
+					else
+					tft.writeFillRect(x+i*size, y+j*size, size, size, bg);
+				}
+			}
+		}
+		if(bg != color) { // If opaque, draw vertical line for last column
+			if(size == 1) tft.writeFastVLine(x+5, y, 8, bg);
+			else          tft.writeFillRect(x+5*size, y, size, 8*size, bg);
+		}
+		tft.endWrite();
+
+	}
+
 void Graphics::drawPlayer(Player &p){
 	char file[24];
 	if (p.isRedrawn())
@@ -298,6 +297,7 @@ void Graphics::drawPlayer(Player &p){
 			strcat(file,number);
 			strcat(file,".bmp");
 		}
+		Serial.println(file);
 		bmpDraw(file,p.getPositionX(),p.getPositionY());
 		p.drawn();
 	}
