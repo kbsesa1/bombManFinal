@@ -87,7 +87,9 @@ int main(){
 	nunchuck.init();
 */
 	
-gfx.drawChar(0,0,132,0xffff,0x0000,1);
+gfx.drawChar(0,0,'A',0xffff,0x0000,1);
+gfx.drawChar(6,0,'B',0xffff,0x0000,1);
+gfx.drawChar(12,0,'C',0xffff,0x0000,1);
 
 //initialisation process task scheduler
 game.init();

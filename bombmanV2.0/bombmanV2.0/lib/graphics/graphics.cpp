@@ -31,10 +31,12 @@ void Graphics::init(){
 	
 	tft.begin();
 	tft.setRotation(1);
-	tft.setCursor(0, 0);
-	tft.fillScreen(0x0000);
+	fillScreen(0x0000);
 }
 
+void Graphics::fillScreen(uint16_t color){
+	tft.fillRect(0,0,ILI9341_TFTWIDTH,ILI9341_TFTHEIGHT,color);
+}
 void Graphics::drawSquare(uint16_t x,uint16_t y){
 	tft.fillRect(x,y, 50,50,gold);
 }
@@ -104,7 +106,7 @@ void Graphics::bmpDraw(char *filename, int16_t x, int16_t y) {
 	uint8_t  r, g, b;
 	uint32_t pos = 0;
 
-	if((x >= tft.width()) || (y >= tft.height())) return;
+	if((x >= ILI9341_TFTWIDTH) || (y >= ILI9341_TFTHEIGHT)) return;
 
 	// Open requested file on SD card
 	if ((bmpFile = SD.open(filename)) == NULL) {
@@ -153,8 +155,8 @@ void Graphics::bmpDraw(char *filename, int16_t x, int16_t y) {
 						y   = 0;
 						h   = y2 + 1;
 					}
-					if(x2 >= tft.width())  w = tft.width()  - x; // Clip right
-					if(y2 >= tft.height()) h = tft.height() - y; // Clip bottom
+					if(x2 >= ILI9341_TFTWIDTH)  w = ILI9341_TFTWIDTH  - x; // Clip right
+					if(y2 >= ILI9341_TFTHEIGHT) h = ILI9341_TFTHEIGHT - y; // Clip bottom
 					
 					// Set TFT address window to clipped image bounds
 					tft.startWrite(); // Requires start/end transaction now
@@ -226,16 +228,25 @@ void Graphics::drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, u
 
 File     fontFile;
 uint8_t bitmap[5];
+uint16_t charOffset = c*5;
 
 if ((fontFile = SD.open("font.hex")) == NULL) {
 	Serial.println("file not found");
 	return;
 }
-fontFile.seek(c*5);
-for(int i = 0;i<5;i++){
-	bitmap[i] = fontFile.read();
-}
+Serial.print("char: ");
+Serial.println(c,DEC);
+Serial.print("char offset: ");
+Serial.println(charOffset);
+fontFile.seek(charOffset);
+	fontFile.read(bitmap,5);
 fontFile.close();
+for (int i = 0;i<5;i++)
+{
+	Serial.print(bitmap[i],HEX);
+	Serial.print(",");
+}
+Serial.println("");
 
 		if((x >= 320)            || // Clip right
 		(y >= 240)           || // Clip bottom
@@ -323,39 +334,39 @@ void Graphics::drawButton(uint8_t xc, uint8_t yc, uint8_t xl, uint8_t yl){
 
 // Draws the homescreen - switch 1
 void Graphics::drawHomescreen(){
-	tft.fillScreen(grey);
+	fillScreen(grey);
 	//tft.setTextSize(7);
 	//tft.setTextColor(gold);
-	tft.setCursor(33, 15);
+	//tft.setCursor(33, 15);
 	//tft.print("BOMBER");
-	tft.setCursor(95, 80);
+	//tft.setCursor(95, 80);
 	//tft.print("MAN");
 	drawButton(30,150, 120, 50);
 	drawButton(170, 150, 120, 50);
 	//tft.setTextSize(3);
 	//tft.setTextColor(black);
-	tft.setCursor(50, 165);
+	//tft.setCursor(50, 165);
 	//tft.print("Start");
-	tft.setCursor(195, 165);
+	//tft.setCursor(195, 165);
 	//tft.print("Join");
 }
 
 // Draws the lobbyscreen - switch 2
 void Graphics::drawLobby(){
-	tft.fillScreen(grey);
+	fillScreen(grey);
 	//tft.setTextSize(5);
 	//tft.setTextColor(gold);
-	tft.setCursor(29,15);
+	//tft.setCursor(29,15);
 	//tft.print("BOMBERMAN");
 	drawButton(20, 60, 90, 110);
 	//tft.setTextColor(black);
 	//tft.setTextSize(5);
-	tft.setCursor(38,95);
+	//tft.setCursor(38,95);
 	//tft.print("GO");
 	drawButton(20, 180, 90, 45);
 	//tft.setTextColor(black);
 	//tft.setTextSize(3);
-	tft.setCursor(33,192);
+	//tft.setCursor(33,192);
 	//tft.print("back");
 	drawButton(120, 60, 180,165);
 	tft.fillRect(130,70,160,145,grey);

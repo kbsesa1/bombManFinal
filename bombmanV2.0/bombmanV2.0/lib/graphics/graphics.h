@@ -9,7 +9,7 @@
 	#include "WProgram.h"
 #endif
 
-#include <Small-ILI9341.h>
+#include <Adafruit_ILI9341.h>
 #include <SPI.h>
 #include <SD.h>
 #include "../entities/player.h"
@@ -38,6 +38,7 @@ class Graphics
 	void drawLobby();
 	void drawButton(uint8_t xc, uint8_t yc, uint8_t xl, uint8_t yl);
 	void drawChar(int16_t x, int16_t y, unsigned char c,uint16_t color, uint16_t bg, uint8_t size);
+	void fillScreen(uint16_t color);
 	protected:
 	private:	
 	uint16_t getXfromGrid(uint8_t grid);
