@@ -37,7 +37,10 @@ class Graphics
 	void drawHomescreen();
 	void drawLobby();
 	void drawButton(uint8_t xc, uint8_t yc, uint8_t xl, uint8_t yl);
-	void drawChar(int16_t x, int16_t y, unsigned char c,uint16_t color, uint16_t bg, uint8_t size);
+	void setTextSize(uint8_t size);
+	void setTextColor(uint16_t color);	
+	void print(int16_t x, int16_t y, unsigned char *str);
+	void drawChar(int16_t x, int16_t y, unsigned char c);
 	void fillScreen(uint16_t color);
 	protected:
 	private:	

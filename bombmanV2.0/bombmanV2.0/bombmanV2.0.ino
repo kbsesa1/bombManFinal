@@ -1,6 +1,6 @@
 //Bomberman opdracht voor KBS ESA1 - door Bart, Jarom, Joost en Rik
 //Libraries--------
-//#include <Adafruit_STMPE610.h>
+#include <Adafruit_STMPE610.h>
 //#include <ArduinoNunchuk.h>
 #include <TaskScheduler.h>
 //project specific
@@ -9,8 +9,8 @@
 #include "lib/controls/controls.h"
 
 //Defines----------
-#define GRIDWIDTH
-#define GRIDHEIGHT
+#define GRIDWIDTH 11
+#define GRIDHEIGHT 9
 #define STMPE_CS 8
 
 //data voor het scherm voor touchscreen functionaliteit
@@ -30,7 +30,7 @@ scherm_t scherm;
 Scheduler game;
 IR ir = IR(true);
 Graphics gfx;
-//Adafruit_STMPE610 ts = Adafruit_STMPE610(8);
+Adafruit_STMPE610 ts = Adafruit_STMPE610(8);
 Player p1 = Player(PLAYERONE);
 Map map1 = Map();
 //ArduinoNunchuk nunchuck = ArduinoNunchuk();
@@ -60,7 +60,7 @@ void onMenu(uint8_t menuCase);
 //Tasks----------
 Task mapDraw (50, -1, &onMapDraw);
 Task gameTest (200, -1, &onGameTest);
-//Task menu (1, -1, &onMenu);
+Task menu (1, -1, &onMenu);
 
 int main(){
 	//initialisation process Arduino UNO
@@ -78,7 +78,7 @@ int main(){
 	
 	
 	//initialisation process touchscreen support
-	//ts.begin();
+	ts.begin();
 
 /*
 	//initialisation process Wii nunchuck
@@ -86,23 +86,33 @@ int main(){
 	PORTC |= (1<<PORTC3);
 	nunchuck.init();
 */
-	
-gfx.drawChar(0,0,'A',0xffff,0x0000,1);
-gfx.drawChar(6,0,'B',0xffff,0x0000,1);
-gfx.drawChar(12,0,'C',0xffff,0x0000,1);
+
 
 //initialisation process task scheduler
 game.init();
 game.addTask(mapDraw);
 game.addTask(gameTest);
-//game.addTask(menu);
-//menu.enable();
+game.addTask(menu);
 
+//menu.enable();
 //mapDraw.enable();
-gameTest.enable();
+//gameTest.enable();
 //game.addTask(printIRData);
 //irCommunication.enable();
 //printIRData.enable();
+gfx.setTextSize(3);
+gfx.print(0,0,"kartoffelsalat");
+delay(2000);
+gfx.fillScreen(black);
+gfx.drawLobby();
+delay(2000);
+gfx.fillScreen(black);
+gfx.drawHomescreen();
+delay(2000);
+map1.buildMap(0);
+gfx.fillScreen(black);
+gfx.drawWall(GRIDHEIGHT,GRIDWIDTH);
+gfx.drawMap(map1);
 
 	while(1){
 		game.execute();	
@@ -117,7 +127,7 @@ void onMapDraw(){
 void onGameTest(){
 	p1.walk(DOWN);
 }
-/*
+
 void onMenu(){
 	if (ts.bufferEmpty()) {
 		return;
@@ -144,4 +154,3 @@ void onMenu(){
 	}
 	
 }
-*/

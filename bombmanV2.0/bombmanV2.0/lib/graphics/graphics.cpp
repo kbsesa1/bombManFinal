@@ -1,9 +1,11 @@
 #include "graphics.h"
 //Colors
 #define black 0x0000
+#define white 0xffff
 #define brown 0xB3CA
 #define gold  0xFE41
 #define grey  0x7BEF
+
 
 #define BUFFPIXEL 5	
 
@@ -12,6 +14,9 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(10, 9);
 
 
 char wallPath[] = "map/Wall1.bmp";
+
+uint8_t textSize = 1;
+uint16_t textColor = white;
 
 class Player;
 class Map;
@@ -224,7 +229,21 @@ uint32_t Graphics::read32(File &f) {
 	return result;
 }
 
-void Graphics::drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t size) {
+void  Graphics::setTextSize(uint8_t size){
+	textSize = size;
+}
+void  Graphics::setTextColor(uint16_t color){
+	textColor = color;
+}
+void  Graphics::print(int16_t x, int16_t y, unsigned char *str){
+	uint8_t index = 0;
+	while(str[index] != '\0'){
+		drawChar(x+(textSize*6*index),y,str[index]);
+		index++;
+	}
+}
+
+void Graphics::drawChar(int16_t x, int16_t y, unsigned char c) {
 
 File     fontFile;
 uint8_t bitmap[5];
@@ -234,47 +253,29 @@ if ((fontFile = SD.open("font.hex")) == NULL) {
 	Serial.println("file not found");
 	return;
 }
-Serial.print("char: ");
-Serial.println(c,DEC);
-Serial.print("char offset: ");
-Serial.println(charOffset);
 fontFile.seek(charOffset);
 	fontFile.read(bitmap,5);
 fontFile.close();
-for (int i = 0;i<5;i++)
-{
-	Serial.print(bitmap[i],HEX);
-	Serial.print(",");
-}
-Serial.println("");
 
 		if((x >= 320)            || // Clip right
 		(y >= 240)           || // Clip bottom
-		((x + 6 * size - 1) < 0) || // Clip left
-		((y + 8 * size - 1) < 0))   // Clip top
+		((x + 6 * textSize - 1) < 0) || // Clip left
+		((y + 8 * textSize - 1) < 0))   // Clip top
 		return;
 
 		
 		tft.startWrite();
 		for(int8_t i=0; i<5; i++ ) { // Char bitmap = 5 columns
-			uint8_t line = bitmap[c * 5 + i];
+			uint8_t line = bitmap[i];
 			for(int8_t j=0; j<8; j++, line >>= 1) {
 				if(line & 1) {
-					if(size == 1)
-					tft.writePixel(x+i, y+j, color);
+					if(textSize == 1)
+					tft.writePixel(x+i, y+j, textColor);
 					else
-					tft.writeFillRect(x+i*size, y+j*size, size, size, color);
-					} else if(bg != color) {
-					if(size == 1)
-					tft.writePixel(x+i, y+j, bg);
-					else
-					tft.writeFillRect(x+i*size, y+j*size, size, size, bg);
+					tft.writeFillRect(x+i*textSize, y+j*textSize, textSize, textSize, textColor);
+					
 				}
 			}
-		}
-		if(bg != color) { // If opaque, draw vertical line for last column
-			if(size == 1) tft.writeFastVLine(x+5, y, 8, bg);
-			else          tft.writeFillRect(x+5*size, y, size, 8*size, bg);
 		}
 		tft.endWrite();
 
@@ -335,39 +336,38 @@ void Graphics::drawButton(uint8_t xc, uint8_t yc, uint8_t xl, uint8_t yl){
 // Draws the homescreen - switch 1
 void Graphics::drawHomescreen(){
 	fillScreen(grey);
-	//tft.setTextSize(7);
-	//tft.setTextColor(gold);
+	setTextSize(7);
+	setTextColor(gold);
 	//tft.setCursor(33, 15);
-	//tft.print("BOMBER");
+	print(33,15,"BOMBER");
 	//tft.setCursor(95, 80);
-	//tft.print("MAN");
+	print(95,80,"MAN");
 	drawButton(30,150, 120, 50);
 	drawButton(170, 150, 120, 50);
-	//tft.setTextSize(3);
-	//tft.setTextColor(black);
+	setTextSize(3);
+	setTextColor(black);
 	//tft.setCursor(50, 165);
-	//tft.print("Start");
+	print(50,165,"Start");
 	//tft.setCursor(195, 165);
-	//tft.print("Join");
+	print(195,165,"Join");
 }
 
 // Draws the lobbyscreen - switch 2
 void Graphics::drawLobby(){
 	fillScreen(grey);
-	//tft.setTextSize(5);
-	//tft.setTextColor(gold);
-	//tft.setCursor(29,15);
-	//tft.print("BOMBERMAN");
+	setTextSize(5);
+	setTextColor(gold);
+	print(29,15,"BOMBERMAN");
 	drawButton(20, 60, 90, 110);
-	//tft.setTextColor(black);
-	//tft.setTextSize(5);
-	//tft.setCursor(38,95);
-	//tft.print("GO");
+	setTextColor(black);
+	setTextSize(5);
+	//tft.setCursor(38,95); positie zit bij print in
+	print(38,95,"GO");
 	drawButton(20, 180, 90, 45);
-	//tft.setTextColor(black);
-	//tft.setTextSize(3);
+	setTextColor(black);
+	setTextSize(3);
 	//tft.setCursor(33,192);
-	//tft.print("back");
+	print(33,192,"back");
 	drawButton(120, 60, 180,165);
 	tft.fillRect(130,70,160,145,grey);
 }
