@@ -31,7 +31,7 @@ class Graphics
 	void init();
 	void drawWall(uint8_t height,uint8_t width);
 	void drawMap(Map &m);
-	void updateMap();
+	void updateMap(Map &m);
 	void drawPlayer(Player &p);
 	void drawMenu(uint8_t menu);
 	void drawHomescreen();

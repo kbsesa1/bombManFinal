@@ -1,6 +1,9 @@
 
 #include "Map.h"
 
+
+
+
 uint8_t Map::getMapData(uint8_t x,uint8_t y){
 	return mapData[y][x];
 }
@@ -46,3 +49,4 @@ void Map::changeBlock(uint8_t x,uint8_t y,uint8_t state){
 	}
 	
 }
+

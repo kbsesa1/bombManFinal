@@ -17,15 +17,17 @@
 #define CRATE 2
 
 class Map{
-	public:
+	private:
 	uint8_t mapData[GRIDHEIGHT][GRIDWIDTH];
+	public:	
 	uint8_t updates[20][3];
 	uint8_t updateIndex = 0;
 	uint8_t getMapData(uint8_t x,uint8_t y);
 	void setMapData(uint8_t x,uint8_t y,uint8_t value);
 	void buildMap(uint8_t scenario);
 	void changeBlock(uint8_t x,uint8_t y,uint8_t state);
+	
 	};
-
+	
 #endif
 

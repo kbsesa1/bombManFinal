@@ -69,7 +69,12 @@ void Graphics::drawMap(Map &m){
 	}
 }
 
-void Graphics::updateMap(){
+void Graphics::updateMap(Map &m){
+	while(m.updateIndex > 0){
+	drawGridBlock(m.updates[m.updateIndex-1][0],m.updates[m.updateIndex-1][1],m.updates[m.updateIndex-1][2]);
+	m.setMapData(m.updates[m.updateIndex-1][0],m.updates[m.updateIndex-1][1],m.updates[m.updateIndex-1][2]);
+	m.updateIndex --;	
+	}
 	
 }
 void Graphics::drawGridBlock(uint8_t x,uint8_t y,uint8_t state){

@@ -40,7 +40,7 @@ uint8_t huidig_scherm_menu = 0;
 uint8_t keuze_touch_menu = 1;
 
 //test
-uint8_t gameTestIndex;
+uint8_t gameTestIndex = 0;
 uint8_t stepsIndex;
 uint8_t directionIndex;
 
@@ -59,7 +59,7 @@ void onGameTest();
 void onMenu(uint8_t menuCase);
 //Tasks----------
 Task mapDraw (50, -1, &onMapDraw);
-Task gameTest (200, -1, &onGameTest);
+Task gameTest (500, -1, &onGameTest);
 Task menu (1, -1, &onMenu);
 
 int main(){
@@ -95,37 +95,39 @@ game.addTask(gameTest);
 game.addTask(menu);
 
 //menu.enable();
-//mapDraw.enable();
-//gameTest.enable();
+mapDraw.enable();
+gameTest.enable();
 //game.addTask(printIRData);
 //irCommunication.enable();
 //printIRData.enable();
-gfx.setTextSize(3);
-gfx.print(0,0,"kartoffelsalat");
-delay(2000);
-gfx.fillScreen(black);
-gfx.drawLobby();
-delay(2000);
-gfx.fillScreen(black);
-gfx.drawHomescreen();
-delay(2000);
+
 map1.buildMap(0);
-gfx.fillScreen(black);
-gfx.drawBlock(0,0,1);
-gfx.drawBlock(0,20,2);
+gfx.drawWall(GRIDHEIGHT,GRIDWIDTH);
+gfx.drawMap(map1);
 
 	while(1){
 		game.execute();	
+		
 	}
 }
 
 void onMapDraw(){
-	gfx.updateMap();
+	gfx.updateMap(map1);
 	gfx.drawPlayer(p1);
 }
 
 void onGameTest(){
 	p1.walk(DOWN);
+	if (gameTestIndex)
+	{
+		map1.changeBlock(2,0,WALL);
+		gameTestIndex = 0;
+	}
+	else{
+		map1.changeBlock(2,0,OPENSPACE);
+		gameTestIndex = 1;
+	}
+	
 }
 
 void onMenu(){
