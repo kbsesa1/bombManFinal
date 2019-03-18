@@ -42,6 +42,9 @@ class Graphics
 	void print(int16_t x, int16_t y, unsigned char *str);
 	void drawChar(int16_t x, int16_t y, unsigned char c);
 	void fillScreen(uint16_t color);
+	void bmpDraw(char *filename, int16_t x, int16_t y);
+	void drawBlock(uint8_t x,uint8_t y,uint8_t state);
+	void drawGridBlock(uint8_t x,uint8_t y,uint8_t state);
 	protected:
 	private:	
 	uint16_t getXfromGrid(uint8_t grid);
@@ -49,9 +52,9 @@ class Graphics
 	uint16_t read16(File &f);
 	uint32_t read32(File &f);
 	uint16_t color565(uint8_t red, uint8_t green, uint8_t blue);
-	void bmpDraw(char *filename, int16_t x, int16_t y);
+	
 	void drawSquare(uint16_t x,uint16_t y);
-	void drawBlock(uint8_t x,uint8_t y,uint8_t state);
+	
 };
 
 

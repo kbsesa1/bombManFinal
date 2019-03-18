@@ -12,9 +12,6 @@
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(10, 9);
 
-
-char wallPath[] = "map/Wall1.bmp";
-
 uint8_t textSize = 1;
 uint16_t textColor = white;
 
@@ -49,16 +46,16 @@ void Graphics::drawSquare(uint16_t x,uint16_t y){
 void Graphics::drawWall(uint8_t height,uint8_t width){
 	//draw top wall
 	for(int i = 0;i<width+2;i++) {
-		bmpDraw(wallPath,i*20,0);
+		drawBlock(i*20,0,1);
 	}
 	//draw sides
 	for(int i = 0;i<height;i++) {
-		bmpDraw(wallPath,0,(i*20)+20);
-		bmpDraw(wallPath,(width+1)*20,(i*20)+20);
+		drawBlock(0,(i*20)+20,1);
+		drawBlock((width+1)*20,(i*20)+20,1);
 	}
 	//draw bottom wall
 	for(int i = 0;i<width+2;i++) {
-		bmpDraw(wallPath,i*20,(height+1)*20);
+		drawBlock(i*20,(height+1)*20,1);
 	}
 }
 
@@ -67,7 +64,7 @@ void Graphics::drawMap(Map &m){
 	{
 		for (uint8_t y = 0;y<GRIDHEIGHT;y++)
 		{
-			drawBlock(x,y,m.getMapData(x,y));
+			drawGridBlock(x,y,m.getMapData(x,y));
 		}
 	}
 }
@@ -75,17 +72,20 @@ void Graphics::drawMap(Map &m){
 void Graphics::updateMap(){
 	
 }
+void Graphics::drawGridBlock(uint8_t x,uint8_t y,uint8_t state){
+	drawBlock(getXfromGrid(x),getYfromGrid(y),state);
+}
 
 void Graphics::drawBlock(uint8_t x,uint8_t y,uint8_t state){
 	switch (state){
 		case 1:
-		bmpDraw(wallPath,getXfromGrid(x),getYfromGrid(y));
+		bmpDraw("map/Wall1.bmp",x,y);
 		break;
 		case 2:
-		bmpDraw("map/Crate1.bmp",getXfromGrid(x),getYfromGrid(y));
+		bmpDraw("map/Crate1.bmp",x,y);
 		break;
 		default:
-		tft.fillRect(getXfromGrid(x),getYfromGrid(y),20,20,0x0000);
+		tft.fillRect(x,y,20,20,0x0000);
 		break;
 	}
 }

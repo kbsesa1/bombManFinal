@@ -111,8 +111,8 @@ gfx.drawHomescreen();
 delay(2000);
 map1.buildMap(0);
 gfx.fillScreen(black);
-gfx.drawWall(GRIDHEIGHT,GRIDWIDTH);
-gfx.drawMap(map1);
+gfx.drawBlock(0,0,1);
+gfx.drawBlock(0,20,2);
 
 	while(1){
 		game.execute();	
